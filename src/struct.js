@@ -11,7 +11,6 @@ https://github.com/racerxdl/struct.js
 For licensing read LICENSE at github
 
 */
-
 var Struct = { "version" : 0.1, "showerrors":true, "shownotice" : true };
 
 /*  Enums   */
@@ -34,6 +33,10 @@ for(var i=0;i<64;i++)   {
     Struct.b[i] = Math.pow(2,i);
 }
 
+/*  This is a hack, because sometimes charCodeAt answer a two byte data */
+String.prototype.GetByteAt = function(index)    {
+    return (this.charCodeAt(index) & 0xFF);
+};
 
 /*  Main unpack function */
 Struct.unpack = function(mode, string)  {
@@ -92,7 +95,7 @@ Struct.unpack = function(mode, string)  {
 Struct.unpackstring     = function(string, start)   {
     var outstring = "", i = start;
     while(true) {
-        if(string.charCodeAt(i) == 0)
+        if(string.GetByteAt(i) == 0)
             break;
         outstring += string[i];
         ++i;
@@ -103,8 +106,8 @@ Struct.unpackstring     = function(string, start)   {
 /*  Unpack Double   */
 Struct.unpackdouble     = function(string, endianess, start, signed)  {
     var bytes = (endianess==Struct.LittleEndian) ?
-                [ string.charCodeAt(start+7),string.charCodeAt(start+6),string.charCodeAt(start+5),string.charCodeAt(start+4),string.charCodeAt(start+3),string.charCodeAt(start+2),string.charCodeAt(start+1),string.charCodeAt(start+0) ] :
-                [ string.charCodeAt(start+0),string.charCodeAt(start+1),string.charCodeAt(start+2),string.charCodeAt(start+3),string.charCodeAt(start+4),string.charCodeAt(start+5),string.charCodeAt(start+6),string.charCodeAt(start+7) ],
+                [ string.GetByteAt(start+7),string.GetByteAt(start+6),string.GetByteAt(start+5),string.GetByteAt(start+4),string.GetByteAt(start+3),string.GetByteAt(start+2),string.GetByteAt(start+1),string.GetByteAt(start+0) ] :
+                [ string.GetByteAt(start+0),string.GetByteAt(start+1),string.GetByteAt(start+2),string.GetByteAt(start+3),string.GetByteAt(start+4),string.GetByteAt(start+5),string.GetByteAt(start+6),string.GetByteAt(start+7) ],
     sign = ((bytes[0] & 0x80) >> 7) > 0            
     a = ((bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3]) >>> 0,
     b = ((bytes[4] << 24) + (bytes[5] << 16) + (bytes[6] << 8) + bytes[7]) >>> 0,
@@ -116,8 +119,8 @@ Struct.unpackdouble     = function(string, endianess, start, signed)  {
 /*  Unpack float */
 Struct.unpackfloat     = function(string, endianess, start, signed)  {
     var bytes = (endianess==Struct.LittleEndian) ?
-                [ string.charCodeAt(start+3),string.charCodeAt(start+2),string.charCodeAt(start+1),string.charCodeAt(start+0) ] :
-                [ string.charCodeAt(start+0),string.charCodeAt(start+1),string.charCodeAt(start+2),string.charCodeAt(start+3) ],
+                [ string.GetByteAt(start+3),string.GetByteAt(start+2),string.GetByteAt(start+1),string.GetByteAt(start+0) ] :
+                [ string.GetByteAt(start+0),string.GetByteAt(start+1),string.GetByteAt(start+2),string.GetByteAt(start+3) ],
         sign = ((bytes[0] & 0x80) >> 7) > 0,
         a = ((bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3]) >>> 0,
         data = (a & 0x7fffff | 0x800000) * 1.0 / Math.pow(2,23) * Math.pow(2,  ((a>>23 & 0xff) - 127))
@@ -127,15 +130,15 @@ Struct.unpackfloat     = function(string, endianess, start, signed)  {
 /*  Unpack Signed/Unsigned Long Long    */
 Struct.unpacklonglong  = function(string, endianess, start, signed)  {
     var retval =    (endianess==Struct.LittleEndian) ?
-                    ( string.charCodeAt(7+start) * Struct.b56 ) + ( string.charCodeAt(6+start) * Struct.b48 ) + ( string.charCodeAt(5+start) * Struct.b40 ) + ( string.charCodeAt(4+start) * Struct.b32 ) + ( string.charCodeAt(3+start) * Struct.b24 ) + ( string.charCodeAt(2+start) * Struct.b16 ) + ( string.charCodeAt(1+start) * Struct.b8 ) + ( string.charCodeAt(0+start) ) :
-                    ( string.charCodeAt(0+start) * Struct.b56 ) + ( string.charCodeAt(1+start) * Struct.b48 ) + ( string.charCodeAt(2+start) * Struct.b40 ) + ( string.charCodeAt(3+start) * Struct.b32 ) + ( string.charCodeAt(4+start) * Struct.b24 ) + ( string.charCodeAt(5+start) * Struct.b16 ) + ( string.charCodeAt(6+start) * Struct.b8 ) + ( string.charCodeAt(7+start));
+                    ( string.GetByteAt(7+start) * Struct.b56 ) + ( string.GetByteAt(6+start) * Struct.b48 ) + ( string.GetByteAt(5+start) * Struct.b40 ) + ( string.GetByteAt(4+start) * Struct.b32 ) + ( string.GetByteAt(3+start) * Struct.b24 ) + ( string.GetByteAt(2+start) * Struct.b16 ) + ( string.GetByteAt(1+start) * Struct.b8 ) + ( string.GetByteAt(0+start) ) :
+                    ( string.GetByteAt(0+start) * Struct.b56 ) + ( string.GetByteAt(1+start) * Struct.b48 ) + ( string.GetByteAt(2+start) * Struct.b40 ) + ( string.GetByteAt(3+start) * Struct.b32 ) + ( string.GetByteAt(4+start) * Struct.b24 ) + ( string.GetByteAt(5+start) * Struct.b16 ) + ( string.GetByteAt(6+start) * Struct.b8 ) + ( string.GetByteAt(7+start));
     retval = (signed & retval > 0x7FFFFFFFFFFFFFFF ) ? -( 0xFFFFFFFFFFFFFFFF - retval + 1 ) : retval ;
     return [retval, 8];
 };
 Struct.unpackint  = function(string, endianess, start, signed)  {
     var retval =    (endianess==Struct.LittleEndian) ?
-                    ( string.charCodeAt(3+start) * Struct.b24 ) + ( string.charCodeAt(2+start) * Struct.b16 ) + ( string.charCodeAt(1+start) * Struct.b8 ) + ( string.charCodeAt(0+start) ) :
-                    ( string.charCodeAt(0+start) * Struct.b24 ) + ( string.charCodeAt(1+start) * Struct.b16 ) + ( string.charCodeAt(2+start) * Struct.b8 ) + ( string.charCodeAt(3+start) );
+                    ( string.GetByteAt(3+start) * Struct.b24 ) + ( string.GetByteAt(2+start) * Struct.b16 ) + ( string.GetByteAt(1+start) * Struct.b8 ) + ( string.GetByteAt(0+start) ) :
+                    ( string.GetByteAt(0+start) * Struct.b24 ) + ( string.GetByteAt(1+start) * Struct.b16 ) + ( string.GetByteAt(2+start) * Struct.b8 ) + ( string.GetByteAt(3+start) );
     retval = (signed && retval > 0x7FFFFFFF) ? -( 0xFFFFFFFF - retval + 1 ) : retval ;
     return [retval, 4];
 };
@@ -143,22 +146,22 @@ Struct.unpackint  = function(string, endianess, start, signed)  {
 /*  Unpack signed/unsigned short */
 Struct.unpackshort = function(string, endianess, start, signed) {
     var retval =    (endianess==Struct.LittleEndian) ?
-                    ( string.charCodeAt(1+start) * Struct.b8 ) + ( string.charCodeAt(0+start) ) :
-                    ( string.charCodeAt(2+start) * Struct.b8 ) + ( string.charCodeAt(3+start) );
+                    ( string.GetByteAt(1+start) * Struct.b8 ) + ( string.GetByteAt(0+start) ) :
+                    ( string.GetByteAt(2+start) * Struct.b8 ) + ( string.GetByteAt(3+start) );
     retval = (signed & retval > 0x7FFF) ? -( 0xFFFF - retval + 1 ) : retval;
     return [retval, 2];
 }
 
 /*  Unpack signed/unsigned char as int  */
 Struct.unpackchar = function(string, endianess, start, signed)  {
-    var retval =    string.charCodeAt(start);
+    var retval =    string.GetByteAt(start);
     retval = (signed & retval > 0x7F) ? - ( 0xFF - retval + 1 ) : retval;    
     return [ retval , 1 ]
 };
 
 /*  Unpack boolean  */
 Struct.unpackbool = function(string, endianess, strpos) {
-    return [ string.charCodeAt(strpos) > 0, 1 ];
+    return [ string.GetByteAt(strpos) > 0, 1 ];
 };
 
 Struct.pack = function(mode, data)  {
