@@ -15,6 +15,7 @@ What is done
 ========
 *   Full unpack support. I implemented all types unpack from python struct
 *   Big Endian and Little endian Support. You can choose the endianess like you do in python struct.
+*   Make use of Typed Arrays, Array Buffer and DataView from HTML5 Spec
 
 TODO
 =======
