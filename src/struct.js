@@ -54,6 +54,21 @@ Struct.String2ArrayBuffer = function(str)   {
     return buf;
 };
 
+/*  IE10 Hack for ArrayBuffer slice */
+if(!ArrayBuffer.prototype.slice)    {
+    ArrayBuffer.prototype.slice = function(start,end)   {
+        var arr = ArrayBuffer(end-start);
+        var uchar = new Uint8Array(this);
+        var uchar2 = new Uint8Array(arr);
+        var c = 0;
+        for(var i=start;i<end;i++)  {
+            uchar2[c] = uchar[i];
+            c++;
+        }
+        return arr;
+    };
+};
+ 
 /*  Main unpack function */
 Struct.unpack = function(mode, string)  {
     var retval = [],
