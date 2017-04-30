@@ -31,7 +31,7 @@ import struct
 data = '\xd2\x04\x00\x00'
 struct.unpack("I", data)    #   This will return (1234,)
 ```
-So in **struct.js** you will do basicly the same:
+So in **struct-old.js** you will do basicly the same:
 ```javascript
 var data = '\xd2\x04\x00\x00';
 struct.unpack("I", data);   //   This will return [1234]
@@ -44,7 +44,7 @@ data = '\xe0#\x00\x00\x00\x00(Aa'
 struct.unpack("Ifc", data)  #   This will return (9184, 10.5, 'a')
 ```
 
-In **struct.js**:
+In **struct-old.js**:
 ```javascript
 var data = '\xe0#\x00\x00\x00\x00(Aa';
 struct.unpack("Ifc", data); //  This will return [9184, 10.5, "a"]
