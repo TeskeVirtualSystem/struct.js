@@ -1,91 +1,117 @@
-         _                   _      _     
-     ___| |_ _ __ _   _  ___| |_   (_)___ 
-    / __| __| '__| | | |/ __| __|  | / __|
-    \__ \ |_| |  | |_| | (__| |_ _ | \__ \
-    |___/\__|_|   \__,_|\___|\__(_)/ |___/
-                                 |__/     
-Description
-========
+      _                   _      _     
+  ___| |_ _ __ _   _  ___| |_   (_)___ 
+ / __| __| '__| | | |/ __| __|  | / __|
+ \__ \ |_| |  | |_| | (__| |_ _ | \__ \
+ |___/\__|_|   \__,_|\___|\__(_)/ |___/
+                              |__/     
 
-This is an implementation of Python Struct to Javascript.
+Python `struct` module port to JavaScript — pack and unpack binary data using format strings.
 
-The idea is to make an easy interface like python struct in javascript to parse strings as C Types.
+Works in Node.js and browsers (no dependencies, uses Web APIs: `ArrayBuffer`, `DataView`, `BigInt`).
 
-What is done
-========
-*   Full unpack support. I implemented all types unpack from python struct
-*   Big Endian and Little endian Support. You can choose the endianess like you do in python struct.
-*   Make use of Typed Arrays, Array Buffer and DataView from HTML5 Spec
+## Install
 
-TODO
-=======
-*   Packing functions. 
-
-How to use it
-=======
-
-In **python**, you use something like that for an int **1234**:
-
-```python
-import struct
-data = '\xd2\x04\x00\x00'
-struct.unpack("I", data)    #   This will return (1234,)
-```
-So in **struct.js** you will do basicly the same:
-```javascript
-var data = '\xd2\x04\x00\x00';
-struct.unpack("I", data);   //   This will return [1234]
+```bash
+npm install struct.js
 ```
 
-It works also for multiple packed data, in **python**:
-```python
-import struct
-data = '\xe0#\x00\x00\x00\x00(Aa'
-struct.unpack("Ifc", data)  #   This will return (9184, 10.5, 'a')
-```
-
-In **struct.js**:
-```javascript
-var data = '\xe0#\x00\x00\x00\x00(Aa';
-struct.unpack("Ifc", data); //  This will return [9184, 10.5, "a"]
-```
-
-The function syntax:
-=======
+## Usage
 
 ```javascript
-struct.unpack(fmt, string)
+import { pack, unpack, calcSize } from "struct.js";
+
+// Pack an unsigned int (1234) — returns ArrayBuffer
+const buf = pack("I", 1234);
+
+// Unpack it back
+unpack("I", buf); // [1234]
+
+// Pack multiple fields
+const buf2 = pack("Ifc", 9184, 10.5, "a");
+unpack("Ifc", buf2); // [9184, 10.5, "a"]
+
+// Big-endian
+const buf3 = pack(">I", 1234);
+unpack(">I", buf3); // [1234]
+
+// Repeat counts
+const buf4 = pack("3I", 10, 20, 30);
+unpack("3I", buf4); // [10, 20, 30]
+
+// Fixed-width strings
+const buf5 = pack("10s", "hello");
+unpack("10s", buf5); // ["hello\0\0\0\0\0"]
+
+// Pascal strings (length-prefixed)
+const buf6 = pack("10p", "hello");
+unpack("10p", buf6); // ["hello"]
+
+// Calculate size without packing
+calcSize("IHHf"); // 14
 ```
 
-Arguments: `fmt` a string containing the types and endianess:
+## API
 
-First Character is endianess (Optional)
-*   `@`	    Little Endian
-*   `=`	    Little Endian
-*   `<`	    Little Endian
-*   `>`	    Big Endian
-*   `!`	    Big Endian
+### `unpack(fmt, input)` → `Array`
 
-First and/or other characters as the format:
+Unpacks binary data according to the format string.
 
-*   Format - C Type - Size  -  Description
-*   `x`	Pad Byte            -   1   -   This just skips one byte at the data
-*   `c`	char                -	1   -   String of Length 1 
-*   `b`	signed char	        -   1   -   Integer
-*   `B`	unsigned char	    -   1   -   Integer
-*   `?`	boolean             -   1   -   Boolean
-*   `h`	short int           -   2   -   Int
-*   `H`	unsigned short	    -   2   -   Integer
-*   `i`	int	                -   4   -   Integer
-*   `I`	unsigned int	    -   4   -   Integer
-*   `l`	long	integer	    -   4	-   Integer
-*   `L`	unsigned long	    -   4   -   Integer
-*   `q`	long long           -   8   -   Integer
-*   `Q`	unsigned long long	-   8   -   Integer
-*   `f`	float	            -   4   -   Float
-*   `d`	double	            -   8   -   Double
-*   `s`	char[]	            -   ?   -   String 
-*   `p`	char[]	            -   ?   -   String
-*   `P`	void *              -   4   -   Integer
+**Input types:** `string` (legacy), `ArrayBuffer`, or `DataView`.
 
-Returns : array with the elements
+### `pack(fmt, ...values)` → `ArrayBuffer`
+
+Packs values into an `ArrayBuffer` according to the format string.
+
+### `calcSize(fmt)` → `number`
+
+Returns the byte size of the packed data for a given format.
+
+### `StructError`
+
+Error class thrown on invalid formats, buffer size mismatches, value count mismatches, or out-of-range values.
+
+## Format String
+
+First character (optional) sets endianness:
+
+| Prefix | Endianness |
+|--------|-----------|
+| `@`, `=`, `<` | Little-endian |
+| `>`, `!` | Big-endian |
+
+Remaining characters define fields. A numeric prefix repeats the field:
+
+| Format | C Type | Size | Description |
+|--------|---------|------|-------------|
+| `x` | pad byte | 1 | Skips bytes (no value consumed) |
+| `c` | char | 1 | Single character string |
+| `b` | signed char | 1 | Integer |
+| `B` | unsigned char | 1 | Integer |
+| `?` | _Bool | 1 | Boolean |
+| `h` | short | 2 | Integer |
+| `H` | unsigned short | 2 | Integer |
+| `i` | int | 4 | Integer |
+| `I` | unsigned int | 4 | Integer |
+| `l` | long | 4 | Integer |
+| `L` | unsigned long | 4 | Integer |
+| `q` | long long | 8 | BigInt |
+| `Q` | unsigned long long | 8 | BigInt |
+| `f` | float | 4 | Float |
+| `d` | double | 8 | Double |
+| `s` | char[] | N | Fixed-width string (N bytes, padded with `\0`) |
+| `p` | char[] | N | Pascal string (1 length byte + N-1 data bytes) |
+| `P` | void * | 4 | Integer (pointer, 32-bit) |
+
+## Dev
+
+```bash
+npm run build      # Copy src/ to dist/
+npm test           # Run tests (vitest)
+npm run test:watch # Watch mode
+npm run lint       # ESLint
+npm run typecheck  # TypeScript declaration check
+```
+
+## License
+
+MIT
