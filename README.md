@@ -1,9 +1,11 @@
+```
       _                   _      _     
   ___| |_ _ __ _   _  ___| |_   (_)___ 
  / __| __| '__| | | |/ __| __|  | / __|
  \__ \ |_| |  | |_| | (__| |_ _ | \__ \
  |___/\__|_|   \__,_|\___|\__(_)/ |___/
                               |__/     
+```
 
 Python `struct` module port to JavaScript — pack and unpack binary data using format strings.
 
