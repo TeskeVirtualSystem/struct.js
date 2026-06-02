@@ -12,13 +12,13 @@ Works in Node.js and browsers (no dependencies, uses Web APIs: `ArrayBuffer`, `D
 ## Install
 
 ```bash
-npm install struct.js
+npm install @teskevirtualsystem/struct.js
 ```
 
 ## Usage
 
 ```javascript
-import { pack, unpack, calcSize } from "struct.js";
+import { pack, unpack, calcSize } from "@teskevirtualsystem/struct.js";
 
 // Pack an unsigned int (1234) — returns ArrayBuffer
 const buf = pack("I", 1234);
