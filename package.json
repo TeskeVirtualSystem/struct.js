@@ -1,6 +1,6 @@
 {
   "name": "struct.js",
-  "version": "1.0.0",
+  "version": "0.0.0-staged.1",
   "description": "Python struct module port to JavaScript — pack/unpack binary data using format strings",
   "type": "module",
   "main": "./dist/index.js",
