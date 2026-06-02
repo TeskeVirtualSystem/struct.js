@@ -1,5 +1,5 @@
 {
-  "name": "struct.js",
+  "name": "@teskevirtualsystem/struct.js",
   "version": "0.0.0-staged.1",
   "description": "Python struct module port to JavaScript — pack/unpack binary data using format strings",
   "type": "module",
